@@ -30,7 +30,7 @@
       "PrivateIP": "172.31.18.44",
       "Project": null,
       "Tenant": null,
-      "Owner": "InfraOps"
+      "Owner": "DevOps"
     },
     {
       "Name": "Luna",
@@ -41,7 +41,7 @@
       "PrivateIP": "172.31.18.2",
       "Project": null,
       "Tenant": null,
-      "Owner": "InfraOps"
+      "Owner": "DevOps"
     },
     {
       "Name": "Everest",
@@ -85,7 +85,7 @@
       "PrivateIP": "10.20.2.34",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "QA"
     },
     {
       "Name": "Titan",
@@ -96,7 +96,7 @@
       "PrivateIP": "172.31.6.6",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "QA"
     },
     {
       "Name": "Mercury",
@@ -107,7 +107,7 @@
       "PrivateIP": "172.31.34.111",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "Security"
     },
     {
       "Name": "Olympus",
@@ -118,7 +118,7 @@
       "PrivateIP": "10.2.1.221",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "Security"
     },
     {
       "Name": "Pegasus",
@@ -129,7 +129,7 @@
       "PrivateIP": "10.2.2.108",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "DataTeam"
     },
     {
       "Name": "Mars",
@@ -140,7 +140,7 @@
       "PrivateIP": "10.2.2.184",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "DataTeam"
     },
     {
       "Name": "Neptune",
@@ -151,7 +151,7 @@
       "PrivateIP": "172.31.20.250",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "DataTeam"
     },
     {
       "Name": "Apollo",
@@ -162,7 +162,7 @@
       "PrivateIP": "10.2.2.44",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "QA"
     },
     {
       "Name": "Oberon",
@@ -173,7 +173,7 @@
       "PrivateIP": "10.2.2.19",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "QA"
     },
     {
       "Name": "Andromeda",
@@ -184,7 +184,7 @@
       "PrivateIP": "10.2.2.125",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "DataTeam"
     },
     {
       "Name": "Helios",
@@ -195,7 +195,7 @@
       "PrivateIP": "10.2.1.158",
       "Project": null,
       "Tenant": null,
-      "Owner": null
+      "Owner": "Security"
     }
   ]
   
