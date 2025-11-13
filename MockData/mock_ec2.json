@@ -1,0 +1,201 @@
+[
+    {
+      "Name": "Atlas",
+      "InstanceId": "i-079847197305044e0",
+      "State": "stopped",
+      "Type": "t2.micro",
+      "AZ": "eu-west-1b",
+      "PrivateIP": "172.31.1.255",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "InfraOps"
+    },
+    {
+      "Name": "Zephyr",
+      "InstanceId": "i-703b111213c9b4090",
+      "State": "stopped",
+      "Type": "c5ad.xlarge",
+      "AZ": "eu-west-1c",
+      "PrivateIP": "172.31.29.186",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "InfraOps"
+    },
+    {
+      "Name": "Ares",
+      "InstanceId": "i-6b4d8b8f3046a6c10",
+      "State": "running",
+      "Type": "c5ad.xlarge",
+      "AZ": "eu-west-1c",
+      "PrivateIP": "172.31.18.44",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "DevOps"
+    },
+    {
+      "Name": "Luna",
+      "InstanceId": "i-1653f30e4d307f0e0",
+      "State": "running",
+      "Type": "t2.medium",
+      "AZ": "eu-west-1c",
+      "PrivateIP": "172.31.18.2",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "DevOps"
+    },
+    {
+      "Name": "Everest",
+      "InstanceId": "i-cd000c7beb7d8db50",
+      "State": "stopped",
+      "Type": "t2.micro",
+      "AZ": "eu-west-1b",
+      "PrivateIP": "172.31.9.235",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "InfraOps"
+    },
+    {
+      "Name": "Vulcan",
+      "InstanceId": "i-4833f0902273bbef0",
+      "State": "stopped",
+      "Type": "c5ad.xlarge",
+      "AZ": "eu-west-1a",
+      "PrivateIP": "172.31.43.69",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "InfraOps"
+    },
+    {
+      "Name": "Juno",
+      "InstanceId": "i-b8414bdccebe5bbc0",
+      "State": "stopped",
+      "Type": "c5ad.xlarge",
+      "AZ": "eu-west-1c",
+      "PrivateIP": "172.31.29.221",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "InfraOps"
+    },
+    {
+      "Name": "Orion",
+      "InstanceId": "i-6f76b1dc6bb1f0a60",
+      "State": "running",
+      "Type": "t2.micro",
+      "AZ": "eu-west-1b",
+      "PrivateIP": "10.20.2.34",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "QA"
+    },
+    {
+      "Name": "Titan",
+      "InstanceId": "i-b08f9715e12f9f740",
+      "State": "running",
+      "Type": "t3.small",
+      "AZ": "eu-west-1b",
+      "PrivateIP": "172.31.6.6",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "QA"
+    },
+    {
+      "Name": "Mercury",
+      "InstanceId": "i-05f922177e6ad82a0",
+      "State": "running",
+      "Type": "t3.small",
+      "AZ": "eu-west-1a",
+      "PrivateIP": "172.31.34.111",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "Security"
+    },
+    {
+      "Name": "Olympus",
+      "InstanceId": "i-d61a0f64885ae71a0",
+      "State": "running",
+      "Type": "t3.small",
+      "AZ": "eu-west-1a",
+      "PrivateIP": "10.2.1.221",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "Security"
+    },
+    {
+      "Name": "Pegasus",
+      "InstanceId": "i-bdaf70e7ffdb283c0",
+      "State": "running",
+      "Type": "c6i.large",
+      "AZ": "eu-west-1b",
+      "PrivateIP": "10.2.2.108",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "DataTeam"
+    },
+    {
+      "Name": "Mars",
+      "InstanceId": "i-0708ea370fe276450",
+      "State": "running",
+      "Type": "c6i.large",
+      "AZ": "eu-west-1b",
+      "PrivateIP": "10.2.2.184",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "DataTeam"
+    },
+    {
+      "Name": "Neptune",
+      "InstanceId": "i-ab584e8a8a254da10",
+      "State": "running",
+      "Type": "c6i.large",
+      "AZ": "eu-west-1c",
+      "PrivateIP": "172.31.20.250",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "DataTeam"
+    },
+    {
+      "Name": "Apollo",
+      "InstanceId": "i-13ef8726aadebb780",
+      "State": "running",
+      "Type": "t3.small",
+      "AZ": "eu-west-1b",
+      "PrivateIP": "10.2.2.44",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "QA"
+    },
+    {
+      "Name": "Oberon",
+      "InstanceId": "i-c36fd40194f6878b0",
+      "State": "running",
+      "Type": "t3.small",
+      "AZ": "eu-west-1b",
+      "PrivateIP": "10.2.2.19",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "QA"
+    },
+    {
+      "Name": "Andromeda",
+      "InstanceId": "i-9d6bea45a6ae5a220",
+      "State": "running",
+      "Type": "c6i.large",
+      "AZ": "eu-west-1b",
+      "PrivateIP": "10.2.2.125",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "DataTeam"
+    },
+    {
+      "Name": "Helios",
+      "InstanceId": "i-19d5afb6e1af27a30",
+      "State": "running",
+      "Type": "t3.small",
+      "AZ": "eu-west-1a",
+      "PrivateIP": "10.2.1.158",
+      "Project": null,
+      "Tenant": null,
+      "Owner": "Security"
+    }
+  ]
+  
