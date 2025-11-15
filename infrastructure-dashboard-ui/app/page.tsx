@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 // --- Types (Matches mock data structure exactly: InstanceID, string for all values) ---
 interface EC2Instance {
   Name: string;
-  InstanceID: string; // Must match 'InstanceID' from json
+  InstanceId: string; // Must match 'InstanceID' from json
   State: string; // e.g., "running", "stopped", "terminated"
   Type: string; // e.g., "t2.micro"
   AZ: string; // e.g., "us-east-1a"
@@ -138,13 +138,13 @@ export default function Home() {
     
     return data.map((instance) => (
       // Using InstanceID as the key
-      <tr key={instance.InstanceID} className="bg-white border-b hover:bg-gray-50/50">
+      <tr key={instance.InstanceId} className="bg-white border-b hover:bg-gray-50/50">
         
         {/* Name / Instance ID */}
         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
           <div className="flex flex-col space-y-0.5">
             <span className="font-semibold">{instance.Name}</span>
-            <span className="text-xs text-gray-500 font-normal">{instance.InstanceID}</span>
+            <span className="text-xs text-gray-500 font-normal">{instance.InstanceId}</span>
           </div>
         </th>
         
