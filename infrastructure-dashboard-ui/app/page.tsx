@@ -16,7 +16,8 @@ interface EC2Instance {
 }
 
 // --- Constants ---
-const API_URL = `http://localhost:5000/api/metrics`;
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
 // --- Utility Components ---
 
