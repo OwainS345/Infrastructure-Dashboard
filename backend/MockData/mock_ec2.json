@@ -178,7 +178,7 @@
     {
       "Name": "Andromeda",
       "InstanceId": "i-9d6bea45a6ae5a220",
-      "State": "running",
+      "State": "terminated",
       "Type": "c6i.large",
       "AZ": "eu-west-1b",
       "PrivateIP": "10.2.2.125",

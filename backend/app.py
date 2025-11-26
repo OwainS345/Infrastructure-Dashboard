@@ -1,11 +1,9 @@
-# app.py
-
 import json
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os
 
-# --- Configuration ---
+#Configuration
 DATA_FILE = 'MockData/mock_ec2.json'
 # The origin of your Next.js frontend, essential for CORS
 FRONTEND_ORIGIN = 'http://localhost:3000'
