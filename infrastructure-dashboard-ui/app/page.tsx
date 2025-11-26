@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 
-// --- Types (Matches mock data structure exactly: InstanceID, string for all values) ---
+//Types (Matches mock data structure exactly: InstanceID, string for all values)
 interface EC2Instance {
   Name: string;
   InstanceId: string; // Must match 'InstanceID' from json
@@ -15,8 +15,9 @@ interface EC2Instance {
   Owner: string;
 }
 
-// --- Constants ---
-const API_URL = `http://localhost:5000/api/metrics`;
+//Constants
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
 
 // --- Utility Components ---
 
@@ -44,7 +45,7 @@ const StateBadge: React.FC<{ state: string }> = ({ state }) => {
   );
 };
 
-// --- Main Component (Home Page) ---
+//Main Component (Home Page)
 
 export default function Home() {
   const [data, setData] = useState<EC2Instance[]>([]);
@@ -97,7 +98,7 @@ export default function Home() {
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [fetchData]);
 
-  // --- Rendering Functions ---
+  //Rendering Functions
 
   const renderTableBody = () => {
     if (loading) {

@@ -1,11 +1,9 @@
-# app.py
-
 import json
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os
 
-# --- Configuration ---
+#Configuration
 DATA_FILE = 'MockData/mock_ec2.json'
 # The origin of your Next.js frontend, essential for CORS
 FRONTEND_ORIGIN = 'http://localhost:3000'
@@ -45,4 +43,5 @@ def get_dashboard_metrics():
 # 4. Run the application
 if __name__ == '__main__':
     # Flask will run on http://127.0.0.1:5000/
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
