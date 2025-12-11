@@ -1,26 +1,26 @@
-#Prototype Compose file, to be modified once AWS is applied 
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: flask_backend_aws
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env.aws
+    volumes:
+      - ./backend:/app
+    command: ["python", "app_aws.py"]
 
-# version: "3.9"
-
-# services:
-#   backend:
-#     build:
-#       context: ./backend
-#     container_name: flask_backend
-#     ports:
-#       - "5000:5000"
-#     environment:
-#       - FLASK_ENV=production
-#     restart: unless-stopped
-
-#   frontend:
-#     build:
-#       context: ./infrastructure-dashboard-ui
-#     container_name: nextjs_frontend
-#     ports:
-#       - "3000:3000"
-#     environment:
-#       NEXT_PUBLIC_API_URL: "http://backend:5000"
-#     depends_on:
-#       - backend
-#     restart: unless-stopped
+  frontend:
+    build:
+      context: ./infrastructure-dashboard-ui
+    container_name: nextjs_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./infrastructure-dashboard-ui:/app
+      - /app/node_modules
+    environment:
+      NEXT_PUBLIC_API_URL: "http://backend:5000/api/metrics"
+    depends_on:
+      - backend
