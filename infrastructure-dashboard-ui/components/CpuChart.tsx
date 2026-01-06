@@ -1,7 +1,7 @@
 "use client";
 
 import * as d3 from "d3";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export interface CpuPoint {
   date: string;   
@@ -21,7 +21,7 @@ export default function CpuChart({ data }: { data: CpuPoint[] }) {
     const height = 300;
     const margin = { top: 20, right: 30, bottom: 30, left: 40 };
 
-    // 🔹 Parse dates
+    // Parse dates
     const parsedData = data.map((d) => ({
       date: new Date(d.date),
       value: d.value,
@@ -66,7 +66,7 @@ export default function CpuChart({ data }: { data: CpuPoint[] }) {
       .attr("transform", `translate(${margin.left},0)`)
       .call(d3.axisLeft(y));
 
-    // 🔹 Draw line
+    // Draw line
     svg
       .append("path")
       .datum(parsedData)
