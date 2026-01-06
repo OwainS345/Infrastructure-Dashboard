@@ -1,248 +1,299 @@
-'use client'; 
+'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import CPUChart, { CpuPoint } from "../components/CpuChart";
 
-//Types (Matches mock data structure exactly: InstanceID, string for all values)
+// --------------------
+// Types
+// --------------------
 interface EC2Instance {
   Name: string;
-  InstanceId: string; // Must match 'InstanceID' from json
-  State: string; // e.g., "running", "stopped", "terminated"
-  Type: string; // e.g., "t2.micro"
-  AZ: string; // e.g., "us-east-1a"
-  PrivateIP: string; // e.g., "10.0.1.15"
+  InstanceId: string;
+  State: string;
+  Type: string;
+  AZ: string;
+  PrivateIP: string;
   Project: string;
   Tenant: string;
   Owner: string;
+  CPUHistory?: number[];
 }
 
-//Constants
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
+// Convert number[] → CpuPoint[]
+function convertCpuHistory(history?: number[]): CpuPoint[] {
+  if (!history) return [];
 
-// --- Utility Components ---
+  return history.map((value, index) => ({
+    date: new Date(Date.now() - (6 - index) * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10),
+    value,
+  }));
+}
 
-/** Maps EC2 State string to simple display text and color badge. */
+// --------------------
+// Soft Pastel Status Badge
+// --------------------
 const StateBadge: React.FC<{ state: string }> = ({ state }) => {
-  // Normalize state for comparison
-  const normalizedState = state.toLowerCase();
-  // Capitalize the first letter for display
-  const displayState = state.charAt(0).toUpperCase() + state.slice(1);
+  const color = state.toLowerCase();
 
-  // Added basic color logic for better visualization
-  let colorClass = 'bg-gray-100 text-gray-800';
-  if (normalizedState === 'running') {
-    colorClass = 'bg-green-100 text-green-800';
-  } else if (normalizedState === 'stopped') {
-    colorClass = 'bg-yellow-100 text-yellow-800';
-  } else if (normalizedState === 'terminated') {
-    colorClass = 'bg-red-100 text-red-800';
-  }
+  const styles: Record<string, string> = {
+    running: "bg-emerald-100 text-emerald-700 border border-emerald-200",
+    stopped: "bg-yellow-100 text-yellow-700 border border-yellow-200",
+    terminated: "bg-red-100 text-red-700 border border-red-200",
+  };
 
   return (
-    <span className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded ${colorClass}`}>
-      {displayState}
+    <span
+      className={`
+        px-3 py-1 
+        text-xs 
+        rounded-full 
+        font-medium 
+        ${styles[color] || "bg-gray-100 text-gray-700 border border-gray-200"}
+      `}
+    >
+      {state.charAt(0).toUpperCase() + state.slice(1)}
     </span>
   );
 };
 
-//Main Component (Home Page)
-
+// --------------------
+// Main Component
+// --------------------
 export default function Home() {
   const [data, setData] = useState<EC2Instance[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<Date | null>(null);
 
-  /** Fetches data from the Flask API with robust error handling and backoff. */
+  const [selectedInstance, setSelectedInstance] = useState<EC2Instance | null>(null);
+
+  // Fetch data from API
   const fetchData = useCallback(async (retries = 3) => {
     setLoading(true);
     setError(null);
+
     for (let i = 0; i < retries; i++) {
       try {
         const response = await fetch(API_URL);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        // Ensure the response is an array of objects
-        const result: unknown = await response.json();
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-        if (!Array.isArray(result)) {
-            throw new Error("API returned non-array data. Expected a list of EC2 instances.");
-        }
-        
-        // TypeScript helps validate structure, we cast it here after checking it's an array.
+        const result = await response.json();
+        if (!Array.isArray(result)) throw new Error("API returned non-array data.");
+
         setData(result as EC2Instance[]);
         setLastFetched(new Date());
-        setError(null);
         setLoading(false);
-        return; // Success, exit function
+        return;
       } catch (err) {
-        console.error(`Attempt ${i + 1} failed:`, err);
         if (i === retries - 1) {
-          // Final attempt failed
-          setError(`Failed to connect to the backend API at ${API_URL}. Is the Flask server running?`);
+          setError(`Failed to connect to backend API at ${API_URL}.`);
           setLoading(false);
-          return; 
         }
-        // Exponential backoff delay
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+        await new Promise((r) => setTimeout(r, Math.pow(2, i) * 1000));
       }
     }
   }, []);
 
   useEffect(() => {
     fetchData();
-    // Auto refresh every 30 seconds
-    const intervalId = setInterval(() => fetchData(1), 30000); 
-    return () => clearInterval(intervalId); // Cleanup on unmount
+    const intervalId = setInterval(() => fetchData(1), 30000);
+    return () => clearInterval(intervalId);
   }, [fetchData]);
 
-  //Rendering Functions
+  // Sidebar ESC close
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedInstance(null);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
+  // Table rows
   const renderTableBody = () => {
-    if (loading) {
-      // Loading indicator with spinner
+    if (loading)
       return (
         <tr>
-          <td colSpan={9} className="px-6 py-4 text-center text-gray-500">
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-500 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Fetching data...
-          </td>
+          <td colSpan={9} className="px-6 py-5 text-center text-gray-500">Loading...</td>
         </tr>
       );
-    }
 
-    if (error) {
+    if (error)
       return (
         <tr>
-          <td colSpan={9} className="px-6 py-4 text-center text-red-600 bg-red-50 border border-red-200">
-            <p className="font-semibold">Connection Error</p>
-            <p className="text-sm">{error}</p>
-          </td>
+          <td colSpan={9} className="px-6 py-5 text-center text-red-600">{error}</td>
         </tr>
       );
-    }
 
-    if (data.length === 0) {
+    if (data.length === 0)
       return (
         <tr>
-          <td colSpan={9} className="px-6 py-4 text-center text-gray-500">
-            No infrastructure data found. The API returned an empty list.
-          </td>
+          <td colSpan={9} className="px-6 py-5 text-center text-gray-500">No data found.</td>
         </tr>
       );
-    }
-    
+
     return data.map((instance) => (
-      // Using InstanceID as the key
-      <tr key={instance.InstanceId} className="bg-white border-b hover:bg-gray-50/50">
-        
-        {/* Name / Instance ID */}
-        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-          <div className="flex flex-col space-y-0.5">
-            <span className="font-semibold">{instance.Name}</span>
-            <span className="text-xs text-gray-500 font-normal">{instance.InstanceId}</span>
+      <tr
+        key={instance.InstanceId}
+        onClick={() => setSelectedInstance(instance)}
+        className="cursor-pointer transition-all hover:bg-white/50 border-b border-gray-200/40"
+      >
+        <td className="px-6 py-5">
+          <div className="flex flex-col">
+            <span className="font-semibold text-[15px] text-gray-900">{instance.Name}</span>
+            <span className="text-[11px] text-gray-400 mt-0.5">{instance.InstanceId}</span>
           </div>
-        </th>
-        
-        {/* State */}
-        <td className="px-6 py-4">
-          <StateBadge state={instance.State} />
         </td>
 
-        {/* Type */}
-        <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-            {instance.Type}
-        </td>
-
-        {/* AZ */}
-        <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
-            {instance.AZ}
-        </td>
-
-        {/* Private IP */}
-        <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-            {instance.PrivateIP}
-        </td>
-        
-        {/* Project */}
-        <td className="px-6 py-4 text-gray-700 whitespace-nowrap">
-            {instance.Project}
-        </td>
-
-        {/* Tenant */}
-        <td className="px-6 py-4 text-gray-700 whitespace-nowrap">
-            {instance.Tenant}
-        </td>
-        
-        {/* Owner */}
-        <td className="px-6 py-4 text-gray-700 whitespace-nowrap">
-            {instance.Owner}
-        </td>
+        <td className="px-6 py-5"><StateBadge state={instance.State} /></td>
+        <td className="px-6 py-5 text-sm">{instance.Type}</td>
+        <td className="px-6 py-5 text-sm">{instance.AZ}</td>
+        <td className="px-6 py-5 text-sm">{instance.PrivateIP}</td>
+        <td className="px-6 py-5 text-sm">{instance.Project}</td>
+        <td className="px-6 py-5 text-sm">{instance.Tenant}</td>
+        <td className="px-6 py-5 text-sm">{instance.Owner}</td>
       </tr>
     ));
   };
 
-
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-sans">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Header and Controls */}
-        <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-          <h1 className="text-xl font-bold text-gray-900">
-            Infrastructure Dashboard
-          </h1>
-          <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-[#f5f6f8] flex font-sans">
+
+      {/* SIDEBAR */}
+      <aside className="w-56 bg-white/70 border-r border-white/40 backdrop-blur-xl shadow p-6 fixed top-0 left-0 h-full">
+        <div className="text-lg font-bold text-gray-700 mb-8">Dashboards</div>
+
+        <nav className="space-y-3">
+          <button className="text-gray-700 font-medium hover:text-black transition">Instances</button>
+        </nav>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <div className="flex-1 ml-56">
+
+        {/* TOP BAR */}
+        <header className="w-full bg-white/70 backdrop-blur-xl border-b border-white/40 shadow px-8 py-4 flex justify-between items-center">
+          <h1 className="text-xl font-semibold text-gray-700">Infrastructure Dashboard</h1>
+          <span className="text-gray-600 text-sm">Logged in as <strong>User</strong></span>
+        </header>
+
+        {/* PAGE CONTENT */}
+        <main className="px-8 pt-10">
+
+          {/* HEADER */}
+          <div className="flex justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-700">Instances</h2>
             <span className="text-sm text-gray-500">
-              Last Update: {lastFetched ? lastFetched.toLocaleTimeString() : 'N/A'}
+              Last Update: {lastFetched ? lastFetched.toLocaleTimeString() : "N/A"}
             </span>
-            
           </div>
+
+          {/* TABLE */}
+          <div className="overflow-hidden rounded-2xl shadow border border-white/40 backdrop-blur-xl bg-white/60">
+            <table className="min-w-full">
+              <thead>
+                <tr className="bg-white/30 backdrop-blur-xl">
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Name / ID</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">State</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">AZ</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Private IP</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Project</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Tenant</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Owner</th>
+                </tr>
+              </thead>
+
+              <tbody className="text-gray-700">
+                {renderTableBody()}
+              </tbody>
+            </table>
+          </div>
+
+        </main>
+      </div>
+
+{/* SLIDE-IN RIGHT PANEL */}
+<div
+  className={`
+    fixed top-0 right-0 h-full w-140 bg-white shadow-xl border-l 
+    transform transition-transform duration-300 z-50
+    ${selectedInstance ? "translate-x-0" : "translate-x-full"}
+  `}
+>
+  {selectedInstance && (
+    <div className="p-6 space-y-6">
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold text-black">{selectedInstance.Name}</h2>
+        <button
+          onClick={() => setSelectedInstance(null)}
+          className="text-gray-500 hover:text-black text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* METADATA */}
+      <div className="text-sm space-y-1 text-black">
+        <p><strong>Instance ID:</strong> {selectedInstance.InstanceId}</p>
+        <p><strong>State:</strong> <StateBadge state={selectedInstance.State} /></p>
+        <p><strong>Type:</strong> {selectedInstance.Type}</p>
+        <p><strong>AZ:</strong> {selectedInstance.AZ}</p>
+        <p><strong>Private IP:</strong> {selectedInstance.PrivateIP}</p>
+        <p><strong>Project:</strong> {selectedInstance.Project}</p>
+        <p><strong>Tenant:</strong> {selectedInstance.Tenant}</p>
+        <p><strong>Owner:</strong> {selectedInstance.Owner}</p>
+      </div>
+
+      {/* SECURITY GROUPS CONTAINER */}
+      <div className="border rounded-xl p-4 shadow-sm bg-gray-50">
+
+        <h3 className="text-md font-semibold mb-3 text-black">Security Groups</h3>
+
+        {/* TABLE HEADER */}
+        <div className="grid grid-cols-3 text-xs font-semibold text-gray-600 pb-2 border-b border-gray-200">
+          <span>Protocol</span>
+          <span>Port</span>
+          <span>Source</span>
         </div>
 
-        {/* Table Container */}
-        <div className="overflow-x-auto border border-gray-300 rounded-lg shadow-xl">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Name / ID
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  State
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Type
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  AZ
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Private IP
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Project
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Tenant
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Owner
-                </th>
-                
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {renderTableBody()}
-            </tbody>
-          </table>
+        {/* TABLE ROWS */}
+        <div className="mt-2 space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="grid grid-cols-3 gap-2 text-xs text-gray-500"
+            >
+              <div className="h-4 bg-gray-200 rounded" />
+              <div className="h-4 bg-gray-200 rounded" />
+              <div className="h-4 bg-gray-200 rounded" />
+            </div>
+          ))}
         </div>
       </div>
+
+      {/* CPU HISTORY CHART */}
+      {selectedInstance.CPUHistory?.length ? (
+        <div className="mt-2">
+          <h3 className="text-md font-semibold mb-2 text-black">
+            7-Day Avg CPU Usage
+          </h3>
+
+          <CPUChart data={convertCpuHistory(selectedInstance.CPUHistory)} />
+        </div>
+      ) : (
+        <p className="text-black italic">No CPU history available.</p>
+      )}
+
     </div>
+  )}
+</div>
+</div>
   );
 }
