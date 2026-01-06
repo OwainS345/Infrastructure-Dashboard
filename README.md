@@ -2,67 +2,103 @@ Infrastructure Dashboard – Project Overview
 
 Client: Glu Systems
 
-Goal:
-Build a simple dashboard that shows the status and details of AWS EC2 instances in one place. The dashboard gives a quick overview of which instances are running or stopped, and lets users view more details such as instance type, owner, and performance trends.
+The Infrastructure Dashboard provides a simple, unified view of AWS EC2 instances, enabling teams to quickly understand instance status, performance, ownership, and configuration.
+
+Goal
+
+Build an easy-to-use dashboard that displays the status and details of AWS EC2 instances in one place.
+The dashboard gives a clear overview of which instances are running, stopped, or terminated and allows users to inspect additional metadata and performance trends.
 
 Key Features (MVP)
+EC2 Instance Overview
 
-View all EC2 instances in a single AWS account and region.
+Instance name, ID, and type
 
-See key details:
+Availability Zone (AZ)
 
--Instance name, ID, and type
+Private IP address
 
--Availability zone and private IP
+Tags:
 
--Tags (Project, Tenant, Owner)
+Project
 
--CPU usage and disk space
+Tenant
 
--Current state (running/stopped)
+Owner
 
--Single-instance view showing:
+CPU usage
 
--Basic metadata (name, type, OS, etc.)
 
--Security groups and attached volumes
+Current state (running / stopped / terminated)
 
--7-day CPU usage chart
+Single-Instance Detail View
+
+Displays:
+
+Basic metadata (name, type, OS, tags, etc.)
+
+7-day CPU usage chart (CloudWatch metrics)
 
 Data Sources
 
--EC2 DescribeInstances: basic instance info
+EC2 DescribeInstances — basic instance info
 
--CloudWatch: CPU and network metrics
+CloudWatch Metrics — CPU and network statistics
 
--SSM / CloudWatch Agent: disk space and patch data
+Deployment Options
+Local Deployment
 
-Deployment
+Run locally using CLI or via the included Docker environment.
 
--Local: Run via CLI or a simple web UI inside Docker
+-----------------------------------
 
-AWS (optional):
+How to Use the Dashboard
+Mock Mode (no AWS required)
 
--ECS Fargate – run in a serverless container managed by AWS
+To run the dashboard using mock data:
 
--EC2 – run on a virtual machine you control
+Open docker-compose.yml
 
-Authentication
+Set:
 
--Local prototype: no login required
+MOCK_MODE=true
 
--Optional: basic authentication if deployed publicly
 
-Stretch Goals (Future Enhancements)
+This loads the pre-packaged mock EC2 dataset.
 
--Instance Management: start, stop, or reboot instances with confirmation prompts
+AWS Mode (live data)
 
--Security Visualization: show relationships between instances, security groups, and rules
+To connect to a real AWS account:
 
--Multi-Account Support: access multiple AWS accounts through AWS Organizations
+Open docker-compose.yml
 
--Cost Insights: display instance costs by project or tenant
+Set:
 
--Change Tracking: record instance actions (start/stop/reboot) using CloudTrail
+MOCK_MODE=false
 
--Topology View: visualize instance → security group → inbound connections
+
+Add AWS credentials to .env:
+
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_secret
+AWS_DEFAULT_REGION=your_region
+
+
+Ensure the IAM role/user has permissions:
+
+ec2:DescribeInstances
+cloudwatch:GetMetricData
+ssm:DescribeInstanceInformation   (if used)
+
+Running the Dashboard (Local)
+Build & Start
+docker compose up --build
+
+Full reset + rebuild
+docker compose down --volumes
+docker compose up --build
+
+
+Once running, open:
+
+http://localhost:3000
