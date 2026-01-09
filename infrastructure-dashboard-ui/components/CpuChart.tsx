@@ -18,7 +18,7 @@ export default function CpuChart({ data }: { data: CpuPoint[] }) {
     svg.selectAll("*").remove(); // Clear old chart
 
     const width = 500;
-    const height = 300;
+    const height = 250;
     const margin = { top: 20, right: 30, bottom: 30, left: 40 };
 
     // Parse dates
@@ -81,7 +81,7 @@ export default function CpuChart({ data }: { data: CpuPoint[] }) {
     <svg
       ref={svgRef}
       width={500}
-      height={300}
+      height={250}
       className="border rounded bg-white shadow text-black"
     ></svg>
   );
